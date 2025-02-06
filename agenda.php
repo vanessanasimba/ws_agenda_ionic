@@ -70,9 +70,9 @@ if ($post['accion']=='cuenta')
     echo $respuesta;
 }
 
-if ($post['accion']=='dato')
+if ($post['accion']=='datoPerfil')
 {
-    $sentecia=sprintf("select * from persona where cod_persona=%s",$post['codigo']);
+    $sentecia=sprintf("select * from persona where cod_persona='%s'",$post['codigo']);
     $rs=mysqli_query($mysqli,$sentecia);
     if (mysqli_num_rows($rs)>0){
         $row = mysqli_fetch_assoc(result:$rs);
@@ -126,5 +126,117 @@ if ($post['accion']=='recuperar')
     }
     echo $respuesta;
 }
+
+if ($post['accion']=='consultar')
+{
+    $sentecia=sprintf("Select * from contacto where  persona_cod_persona='%s'",$post['codigo']);
+    $rs=mysqli_query($mysqli,$sentecia);
+    if (mysqli_num_rows($rs)>0){
+        while($row = mysqli_fetch_array(result: $rs)){
+            $datos[] = array(
+                'codigo' =>  $row['cod_contacto'],
+                'nombre' =>  $row['nom_contacto']." ".$row['ape_contacto'],
+                'telefono' =>  $row['telefono_contacto'],
+                'persona' =>  $row['persona_cod_persona']
+            );
+        }
+        $respuesta = json_encode(array('estado'=>true,'contactos'=>$datos));
+    }else{
+        $respuesta = json_encode(array('estado'=>false,'mensaje'=>'No existe regitros'));
+    }
+    echo $respuesta;
+}
+
+if ($post['accion']=='dato')
+{
+    $sentecia=sprintf("select * from contacto where cod_contacto=%s",$post['codigo']);
+    $rs=mysqli_query($mysqli,$sentecia);
+    if (mysqli_num_rows($rs)>0){
+        $row = mysqli_fetch_assoc(result:$rs);
+        $dato = array(
+            'codigo' =>  $row['cod_contacto'],
+            'nombre' =>  $row['nom_contacto'],
+            'apellido' =>  $row['ape_contacto'],
+            'correo' => $row['email_contacto'],
+            'telefono' => $row['telefono_contacto'],
+            'persona' => $row['persona_cod_persona']
+        );
+        $respuesta = json_encode(array('estado'=>true,'contacto'=>$dato));
+    }else{
+        $respuesta = json_encode(array('estado'=>false,'mensaje'=>'Datos no encontrados'));
+    }
+    echo $respuesta;
+}
+
+if ($post['accion']=='nuevoc')
+{
+    $sentecia=sprintf("INSERT INTO contacto(nom_contacto, ape_contacto, telefono_contacto, email_contacto, persona_cod_persona) VALUES ('%s','%s','%s','%s','%s')",$post['nombre'], $post['apellido'],$post['telefono'], $post['mail'], $post['persona']);
+    $rs=mysqli_query($mysqli,$sentecia);
+    if ($rs){
+        $respuesta = json_encode(array('estado'=>true,'mensaje'=>"datos guardados"));
+    }else{
+        $respuesta = json_encode(array('estado'=>false,'mensaje'=>'Error'));
+    }
+    echo $respuesta;
+}
+
+if ($post['accion']=='vtelefono')
+{
+    $sentecia=sprintf("select cod_contacto from contacto where telefono_contacto='%s' and  persona_cod_persona=%s",$post['telefono'],$post['persona']);
+    $rs=mysqli_query($mysqli,$sentecia);
+    if (mysqli_num_rows($rs)>0){
+        $respuesta = json_encode(array('estado'=>true,'mensaje'=>"Telefono existente en el sistema"));
+    }else{
+        $respuesta = json_encode(array('estado'=>false));
+    }
+    echo $respuesta;
+}
+
+if ($post['accion']=='dcontacto')
+{
+    $sentecia=sprintf("select * from contacto where cod_contacto=%s",$post['codigo']);
+    $rs=mysqli_query($mysqli,$sentecia);
+    if (mysqli_num_rows($rs)>0){
+        $row = mysqli_fetch_assoc(result:$rs);
+        $dato = array(
+            'codigo' =>  $row['cod_contacto'],
+            'nombre' =>  $row['nom_contacto'],
+            'apellido' =>  $row['ape_contacto'],
+            'correo' => $row['email_contacto'],
+            'telefono' => $row['telefono_contacto'],
+            'persona' => $row['persona_cod_persona']
+        );
+        $respuesta = json_encode(array('estado'=>true,'contacto'=>$dato));
+    }else{
+        $respuesta = json_encode(array('estado'=>false,'mensaje'=>'Datos no encontrados'));
+    }
+    echo $respuesta;
+}
+
+if ($post['accion']=='acontacto')
+{
+    $sentecia=sprintf("UPDATE contacto SET nom_contacto='%s',ape_contacto='%s',telefono_contacto='%s' ,email_contacto='%s' WHERE cod_contacto='%s' " ,$post['nombre'], $post['apellido'], $post['telefono'], $post['mail'],$post['codigo']);
+    $rs=mysqli_query($mysqli,$sentecia);
+    if ($rs){
+        $respuesta = json_encode(array('estado'=>true,'mensaje'=>"datos actulizados"));
+    }else{
+        $respuesta = json_encode(array('estado'=>false,'mensaje'=>'Error al actualizar'));
+    }
+    echo $respuesta;
+}
+
+if ($post['accion']=='eliminar')
+{
+    $sentecia=sprintf("DELETE FROM contacto where cod_contacto='%s'", $post['codigo']);
+    $rs=mysqli_query($mysqli,$sentecia);
+    if ($rs){
+        $respuesta = json_encode(array('estado'=>true,'mensaje'=>"Dato eliminado correctamente"));
+    }else{
+        $respuesta = json_encode(array('estado'=>false,'mensaje'=>'Error no se elimino'));
+    }
+    echo $respuesta;
+}
+
+
 
 ?>
